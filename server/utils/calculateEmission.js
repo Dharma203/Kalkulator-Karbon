@@ -1,34 +1,28 @@
-// Faktor emisi dalam kg CO₂e per unit aktivitas
-const emissionFactors = {
-  listrik: 0.85, // contoh: 0.85 kg CO₂e per kWh
-  bensin: 2.31, // contoh: 2.31 kg CO₂e per liter
-  solar: 2.68, // contoh: 2.68 kg CO₂e per liter
-  airTravel: 0.15, // contoh: 0.15 kg CO₂e per km
-  // Tambahkan aktivitas lain jika perlu
-};
+const conversionFactors = require("./conversionFactors");
 
+// Fungsi backend untuk menghitung total emisi dari daftar aktivitas
 const calculateEmission = (activities) => {
   let totalEmission = 0;
+  const emissionBreakdown = {};
 
   activities.forEach((activity) => {
     const { type, amount } = activity;
-    const factor = emissionFactors[type];
-    if (factor && amount > 0) {
-      totalEmission += amount * factor;
+    const factor = conversionFactors[type];
+
+    // Validasi faktor dan nilai amount
+    if (factor && typeof amount === "number" && amount > 0) {
+      const emission = amount * factor;
+      totalEmission += emission;
+
+      // Simpan emisi per tipe aktivitas
+      emissionBreakdown[type] = emission;
     }
   });
 
-  return totalEmission;
+  return {
+    totalEmission,
+    emissionBreakdown,
+  };
 };
 
 module.exports = calculateEmission;
-
-const calculateEmission = require("../utils/calculateEmission");
-
-const activities = [
-  { type: "listrik", amount: 100 },
-  { type: "bensin", amount: 20 },
-];
-
-const total = calculateEmission(activities);
-console.log(total); // Output: total emisi karbon

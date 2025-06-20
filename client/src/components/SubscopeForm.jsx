@@ -16,7 +16,7 @@ const subscopeData = {
   ],
 };
 
-const SubscopeForm = ({ selectedScope, inputValues, onChange }) => {
+const SubscopeForm = ({ selectedScope, inputValues = {}, onChange }) => {
   const subscopeList = subscopeData[selectedScope] || [];
 
   return (
@@ -24,6 +24,7 @@ const SubscopeForm = ({ selectedScope, inputValues, onChange }) => {
       <h3 className="text-lg font-semibold text-gray-800">
         Isi Data Sub-scope
       </h3>
+
       {subscopeList.length === 0 ? (
         <p className="text-sm text-gray-500">
           Tidak ada data sub-scope untuk scope ini.
@@ -33,7 +34,7 @@ const SubscopeForm = ({ selectedScope, inputValues, onChange }) => {
           <div key={sub.id} className="flex flex-col">
             <label
               htmlFor={sub.id}
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-gray-700 mb-1"
             >
               {sub.label}
             </label>
@@ -43,7 +44,7 @@ const SubscopeForm = ({ selectedScope, inputValues, onChange }) => {
               name={sub.id}
               value={inputValues[sub.id] || ""}
               onChange={(e) => onChange(sub.id, e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+              className="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
               placeholder="0"
               min="0"
               step="any"

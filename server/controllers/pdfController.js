@@ -1,69 +1,55 @@
-const PDFDocument = require("pdfkit");
-const { Readable } = require("stream");
+const pdf = require("html-pdf");
+const path = require("path");
+const { generatePdfTemplate } = require("../utils/pdfTemplate");
 
-// Fungsi utilitas untuk membuat stream dari buffer (untuk response streaming)
-function bufferToStream(buffer) {
-  const stream = new Readable();
-  stream.push(buffer);
-  stream.push(null);
-  return stream;
-}
-
-// Handler ekspor PDF
-const exportPDF = (req, res) => {
+const generatePdfReport = (req, res) => {
   try {
-    const {
-      listrik = 0,
-      bahanBakar = 0,
-      perjalanan = 0,
-      totalEmission = 0,
-      scope = "",
-      period = "",
-    } = req.body;
+    const { totalEmission, breakdown, details, periodLabel } = req.body;
 
-    javascript;
+    less;
     Copy;
     Edit;
-    const doc = new PDFDocument();
-    const buffers = [];
+    if (!totalEmission || !breakdown || !periodLabel) {
+      return res.status(400).json({ error: "Data laporan tidak lengkap." });
+    }
 
-    doc.on("data", buffers.push.bind(buffers));
-    doc.on("end", () => {
-      const pdfData = Buffer.concat(buffers);
+    const html = generatePdfTemplate({
+      totalEmission,
+      breakdown,
+      details,
+      periodLabel,
+    });
+
+    const options = {
+      format: "A4",
+      orientation: "portrait",
+      border: {
+        top: "1in",
+        right: "1in",
+        bottom: "1in",
+        left: "1in",
+      },
+    };
+
+    pdf.create(html, options).toBuffer((err, buffer) => {
+      if (err) {
+        console.error("PDF generation error:", err);
+        return res.status(500).json({ error: "Gagal membuat PDF." });
+      }
+
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
         "Content-Disposition",
         "attachment; filename=laporan-emisi.pdf"
       );
-      res.send(pdfData);
+      res.send(buffer);
     });
-
-    // Isi konten PDF
-    doc.fontSize(20).text("Laporan Emisi Karbon", { align: "center" });
-    doc.moveDown();
-
-    doc.fontSize(12).text(`Periode     : ${period || "Tidak ditentukan"}`);
-    doc.text(`Scope Emisi : ${scope || "Tidak ditentukan"}`);
-    doc.moveDown();
-
-    doc.text(`- Konsumsi Listrik   : ${listrik} kWh`);
-    doc.text(`- Bahan Bakar        : ${bahanBakar} liter`);
-    doc.text(`- Jarak Perjalanan   : ${perjalanan} km`);
-    doc.moveDown();
-
-    doc
-      .fontSize(14)
-      .text(`Total Emisi: ${Number(totalEmission).toFixed(2)} kgCO₂e`, {
-        underline: true,
-      });
-
-    doc.end();
   } catch (error) {
-    console.error("Gagal membuat PDF:", error);
-    res.status(500).json({ success: false, message: "Gagal membuat PDF" });
+    console.error("PDF Controller Error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan pada server." });
   }
 };
 
 module.exports = {
-  exportPDF,
+  generatePdfReport,
 };

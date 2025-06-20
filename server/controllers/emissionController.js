@@ -1,73 +1,70 @@
-const { generatePDF } = require("../utils/pdfGenerator"); // pastikan util tersedia jika dibutuhkan
+const conversionFactors = require("../utils/conversionFactors");
+const { formatPeriodLabel } = require("../utils/dateUtils");
 
-// Contoh faktor emisi (kgCO₂e per unit)
-const emissionFactors = {
-  listrik: 0.85, // per kWh
-  bahanBakar: 2.3, // per liter
-  perjalanan: 0.15, // per km
-};
-
-// Fungsi menghitung total emisi berdasarkan input
-const calculateEmission = (data) => {
+const calculateEmission = (scope, subscopeValues) => {
+  const factors = conversionFactors[scope] || {};
   let total = 0;
+  const breakdown = {};
 
-  if (data.listrik) {
-    total += data.listrik * emissionFactors.listrik;
-  }
-  if (data.bahanBakar) {
-    total += data.bahanBakar * emissionFactors.bahanBakar;
-  }
-  if (data.perjalanan) {
-    total += data.perjalanan * emissionFactors.perjalanan;
+  for (const subscope in subscopeValues) {
+    const value = parseFloat(subscopeValues[subscope]) || 0;
+    const factor = factors[subscope] || 0;
+    const emission = value * factor;
+    breakdown[subscope] = emission;
+    total += emission;
   }
 
-  return total;
+  return { total, breakdown };
 };
 
-// Endpoint: POST /api/emissions/calculate
+const calculateAllScopes = (inputData) => {
+  let totalEmission = 0;
+  const breakdown = {
+    scope1: 0,
+    scope2: 0,
+    scope3: 0,
+  };
+
+  const details = {};
+
+  for (const scope of ["scope1", "scope2", "scope3"]) {
+    if (inputData[scope]) {
+      const result = calculateEmission(scope, inputData[scope]);
+      breakdown[scope] = result.total;
+      details[scope] = result.breakdown;
+      totalEmission += result.total;
+    }
+  }
+
+  return { totalEmission, breakdown, details };
+};
+
 const calculateEmissionHandler = (req, res) => {
   try {
-    const inputData = req.body;
-    const totalEmission = calculateEmission(inputData);
+    const { scope, values, period } = req.body;
 
-    lua;
+    kotlin;
     Copy;
     Edit;
-    res.status(200).json({
-      success: true,
+    if (!scope || !values || !period) {
+      return res.status(400).json({ error: "Data tidak lengkap." });
+    }
+
+    const { totalEmission, breakdown, details } = calculateAllScopes(values);
+    const periodLabel = formatPeriodLabel(period);
+
+    return res.json({
       totalEmission,
+      breakdown,
+      details,
+      periodLabel,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Gagal menghitung emisi", error });
-  }
-};
-
-// Optional: Export PDF (jika frontend minta PDF)
-const exportPDFHandler = async (req, res) => {
-  try {
-    const inputData = req.body;
-    const totalEmission = calculateEmission(inputData);
-    const pdfBuffer = await generatePDF({ ...inputData, totalEmission });
-
-    csharp;
-    Copy;
-    Edit;
-    res.set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": "attachment; filename=hasil-emisi.pdf",
-    });
-
-    res.send(pdfBuffer);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Gagal menghasilkan PDF", error });
+    console.error("Error calculating emission:", error);
+    return res.status(500).json({ error: "Terjadi kesalahan pada server." });
   }
 };
 
 module.exports = {
   calculateEmissionHandler,
-  exportPDFHandler,
 };

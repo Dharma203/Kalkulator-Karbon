@@ -1,61 +1,46 @@
-const groupByPeriod = (records, period = "daily") => {
-  const grouped = {};
+// Fungsi untuk memformat tanggal ke format YYYY-MM-DD
+function formatDate(date) {
+  if (!(date instanceof Date)) {
+    date = new Date(date);
+  }
+  return date.toISOString().split("T")[0];
+}
 
-  records.forEach((record) => {
-    const date = new Date(record.date);
-    let key;
+// Fungsi untuk mendapatkan tahun dari string atau objek Date
+function getYear(date) {
+  if (!(date instanceof Date)) {
+    date = new Date(date);
+  }
+  return date.getFullYear();
+}
 
-    javascript;
-    Copy;
-    Edit;
-    switch (period) {
-      case "yearly":
-        key = `${date.getFullYear()}`;
-        break;
-      case "monthly":
-        key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-          2,
-          "0"
-        )}`;
-        break;
-      case "daily":
-      default:
-        key = date.toISOString().split("T")[0]; // YYYY-MM-DD
-        break;
-    }
+// Fungsi untuk mendapatkan bulan dari 0–11 menjadi 1–12
+function getMonth(date) {
+  if (!(date instanceof Date)) {
+    date = new Date(date);
+  }
+  return date.getMonth() + 1;
+}
 
-    if (!grouped[key]) {
-      grouped[key] = [];
-    }
+// Fungsi untuk mendapatkan nama bulan (opsional)
+function getMonthName(date, locale = "id-ID") {
+  if (!(date instanceof Date)) {
+    date = new Date(date);
+  }
+  return date.toLocaleString(locale, { month: "long" });
+}
 
-    grouped[key].push(record);
-  });
-
-  return grouped;
-};
-
-const sumEmissionsByPeriod = (records, period = "daily") => {
-  const grouped = groupByPeriod(records, period);
-  const result = [];
-
-  Object.entries(grouped).forEach(([key, group]) => {
-    const total = group.reduce((sum, item) => sum + item.totalEmission, 0);
-    result.push({
-      period: key,
-      totalEmission: total,
-    });
-  });
-
-  // Optional: sort ascending by period
-  result.sort((a, b) => a.period.localeCompare(b.period));
-
-  return result;
-};
+// Fungsi untuk membandingkan apakah dua tanggal berada pada bulan dan tahun yang sama
+function isSamePeriod(dateA, dateB) {
+  const a = new Date(dateA);
+  const b = new Date(dateB);
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
+}
 
 module.exports = {
-  groupByPeriod,
-  sumEmissionsByPeriod,
+  formatDate,
+  getYear,
+  getMonth,
+  getMonthName,
+  isSamePeriod,
 };
-
-const { sumEmissionsByPeriod } = require("./dateUtils");
-const result = sumEmissionsByPeriod(data, "monthly");

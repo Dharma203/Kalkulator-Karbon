@@ -1,8 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const periodController = require("../controllers/periodController");
+const {
+  createPeriod,
+  getAllPeriods,
+  getPeriodById,
+} = require("../controllers/periodController");
 
-// Endpoint untuk mendapatkan data emisi berdasarkan periode
-router.get("/:period", periodController.getEmissionsByPeriod);
+// POST /api/periods → Buat periode baru
+router.post("/", createPeriod);
+
+// GET /api/periods → Ambil semua periode
+router.get("/", getAllPeriods);
+
+// GET /api/periods/:id → Ambil periode berdasarkan ID
+router.get("/:id", getPeriodById);
 
 module.exports = router;

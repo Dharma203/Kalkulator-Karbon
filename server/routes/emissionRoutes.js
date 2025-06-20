@@ -1,18 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const emissionController = require("../controllers/emissionControllers");
 
-// Menyimpan data emisi baru
-router.post("/add", emissionController.addEmission);
+const {
+  createEmission,
+  getEmissionsByPeriod,
+  getTotalEmissionsSummary,
+} = require("../controllers/emissionController");
 
-// Mengambil semua data emisi
-router.get("/all", emissionController.getAllEmissions);
+// POST /api/emissions → Menyimpan data emisi baru
+router.post("/", createEmission);
 
-// Mengambil data emisi berdasarkan scope (scope1, scope2, scope3)
-router.get("/scope/:scopeId", emissionController.getEmissionsByScope);
+// GET /api/emissions/:periodId → Mengambil semua emisi berdasarkan periode
+router.get("/:periodId", getEmissionsByPeriod);
 
-// Menghapus data emisi berdasarkan ID
-router.delete("/delete/:id", emissionController.deleteEmission);
+// GET /api/emissions/:periodId/summary → Mengambil ringkasan total emisi per scope
+router.get("/:periodId/summary", getTotalEmissionsSummary);
 
-// (Opsional) Update data emisi berdasarkan ID
-// router.put("/update/:id", emissionController.updateEmission);
+module.exports = router;

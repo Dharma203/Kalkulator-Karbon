@@ -24,7 +24,7 @@ const ScopeSelector = ({ selectedScope, onSelectScope }) => {
 
   return (
     <div className="flex flex-col items-center gap-4 p-4">
-      <h2 className="text-xl font-semibold">Pilih Scope Emisi</h2>
+      <h2 className="text-xl font-semibold text-gray-800">Pilih Scope Emisi</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
         {scopes.map((scope) => (
           <button
@@ -36,7 +36,7 @@ const ScopeSelector = ({ selectedScope, onSelectScope }) => {
                 : "bg-white border-gray-300"
             }`}
           >
-            <h3 className="text-lg font-medium">{scope.label}</h3>
+            <h3 className="text-lg font-medium text-gray-800">{scope.label}</h3>
             <p className="text-sm text-gray-600 mt-1">{scope.description}</p>
           </button>
         ))}

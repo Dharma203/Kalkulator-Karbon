@@ -1,19 +1,19 @@
-// Faktor konversi emisi dalam satuan kg CO₂e per unit
+// Faktor konversi emisi dalam satuan kg CO₂e per unit aktivitas
 const conversionFactors = {
-  listrik: 0.85, // per kWh
-  bensin: 2.31, // per liter
-  solar: 2.68, // per liter
-  airTravel: 0.15, // per kilometer (rata-rata penerbangan domestik)
-  kereta: 0.04, // per kilometer (rata-rata emisi kereta api)
-  motor: 2.0, // per liter bensin motor
-  LPG: 1.51, // per kg
-  internet: 0.06, // per GB data
-  belanjaPakaian: 25, // per item pakaian (rata-rata produksi)
-  makanan: 4.5, // per porsi makanan (rata-rata makanan olahan)
-  // Tambahkan faktor lain jika diperlukan
+  // Scope 1 - Emisi langsung dari sumber yang dimiliki atau dikendalikan
+  bensin: 2.31, // liter → kg CO₂e
+  solar: 2.68, // liter → kg CO₂e
+  kendaraan: 0.21, // km → kg CO₂e
+
+  // Scope 2 - Emisi dari energi listrik yang dibeli dan digunakan
+  listrik: 0.9, // kWh → kg CO₂e
+  pendingin: 1.5, // unit → kg CO₂e (perkiraan)
+
+  // Scope 3 - Emisi tidak langsung dari aktivitas rantai nilai
+  airTravel: 0.15, // km → kg CO₂e (pesawat)
+  logistik: 0.15, // km → kg CO₂e
+  akomodasi: 50, // per perjalanan → kg CO₂e
+  pengadaan: 1.2, // per unit barang/jasa → kg CO₂e
 };
 
 module.exports = conversionFactors;
-
-const factors = require("./conversionFactors");
-const emission = jumlahAktivitas * factors.listrik;

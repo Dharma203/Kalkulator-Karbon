@@ -1,54 +1,43 @@
-// Contoh logika pengolahan data berdasarkan periode waktu
-// Jika Anda menggunakan database, logika bisa diperluas untuk query berdasarkan tanggal
+const Period = require("../models/Period");
 
-const getEmissionByPeriod = async (req, res) => {
+// Mendapatkan semua periode dari database
+const getAllPeriods = async (req, res) => {
   try {
-    const { period } = req.query;
+    const periods = await Period.find().sort({ createdAt: -1 });
+    res.status(200).json(periods);
+  } catch (error) {
+    console.error("Error fetching periods:", error);
+    res.status(500).json({ error: "Gagal mengambil data periode" });
+  }
+};
 
-    yaml;
+// Menyimpan data periode baru
+const createPeriod = async (req, res) => {
+  try {
+    const { label, startDate, endDate } = req.body;
+
+    javascript;
     Copy;
     Edit;
-    // Dummy data - seharusnya diganti dengan query ke database jika tersedia
-    const mockData = {
-      daily: [
-        { date: "2025-06-01", emission: 5.2 },
-        { date: "2025-06-02", emission: 6.1 },
-        { date: "2025-06-03", emission: 4.8 },
-      ],
-      monthly: [
-        { month: "Januari", emission: 140 },
-        { month: "Februari", emission: 120 },
-        { month: "Maret", emission: 150 },
-      ],
-      yearly: [
-        { year: 2023, emission: 1600 },
-        { year: 2024, emission: 1720 },
-        { year: 2025, emission: 890 },
-      ],
-    };
-
-    if (!["daily", "monthly", "yearly"].includes(period)) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Parameter 'period' harus berupa 'daily', 'monthly', atau 'yearly'",
-      });
+    if (!label || !startDate || !endDate) {
+      return res.status(400).json({ error: "Semua field wajib diisi" });
     }
 
-    return res.json({
-      success: true,
-      period,
-      data: mockData[period],
+    const newPeriod = new Period({
+      label,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
     });
-  } catch (err) {
-    console.error("Gagal mengambil data periode:", err);
-    res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan saat mengambil data periode",
-    });
+
+    await newPeriod.save();
+    res.status(201).json(newPeriod);
+  } catch (error) {
+    console.error("Error creating period:", error);
+    res.status(500).json({ error: "Gagal menyimpan data periode" });
   }
 };
 
 module.exports = {
-  getEmissionByPeriod,
+  getAllPeriods,
+  createPeriod,
 };
